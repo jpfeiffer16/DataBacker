@@ -3,7 +3,8 @@ module.exports = function(mongoose) {
   {
     fileName: String,
     key: String,
-    content: Buffer
+    content: Buffer,
+    version: String
   });
 
   return BackupObject;

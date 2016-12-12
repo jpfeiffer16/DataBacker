@@ -40,6 +40,8 @@ app.all('*', passport.authenticate('UserAuthentication', { session: false }), (r
   next();
 });
 
+const semver = require('semver');
+
 app.post('/push', (req, res) => {
   if (!req.body.content) res.status(500).send('No content!');
   if (!req.body.key) res.status(500).send('No key!');
@@ -52,23 +54,76 @@ app.post('/push', (req, res) => {
     }
     if (key) {
       //TODO: Update model here
-      console.log('Keys exists');
+      console.log('Key exists');
+      //TODO: User needs to be able to specify version level change
+      let newVersion = semver.inc(key.version, 'major');
+      console.log(newVersion);
+      key.version = newVersion;
+
+      key.save((err) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send();
+        }
+        let newObject = req.body;
+        newObject.version = newVersion;
+        models.BackupObject.create(newObject);
+      });
     } else {
       let newKey = {
         name: req.body.key,
-        version: "1.0.0" ,
+        version: '1.0.0' 
       };
       models.Key.create(newKey);
+
+      let newObject = req.body;
+      newObject.version = '1.0.0';
+      models.BackupObject.create(req.body);
+      res.send('Success!');
     }
   });
-
-  
-  res.send('Success!');
 });
 
-app.get('/get', (req, res) => {
+app.post('/get', (req, res) => {
   
-  res.send('Hello World! You are authenticated.');
+  if (req.body.key) {
+    //Get a specific object
+    if (req.body.version) {
+      //Grab a specific version
+      console.log(req.body);
+      models.BackupObject.findOne({ key : req.body.key, version: req.body.version }, (err, object) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send();
+        }
+        if (!object) {
+          console.error('No object found.');
+          res.status(500).send();
+        }
+        res.send(object.content);
+      });
+    } else {
+      //Else pull most recent
+      models.BackupObject.find({ key: req.body.key }, (err, objects) => {
+        //Find most recent version here.
+        if (err) {
+          console.error(err);
+          res.status(500).send();
+        }
+        if (!objects) {
+          console.error('No object found.');
+          res.status(500).send();
+        }
+
+        res.send(objects.sort((a, b) => {
+          if (a.version == b.version) return 0;
+          return semver.gt(a.version, b.version) ? -1 : 1;
+        })[0].content);
+      });
+    }
+  } else {
+    //Return a list of all objects for user
+  }
 });
 
 app.get('/ensureUser', (req, res) => {
