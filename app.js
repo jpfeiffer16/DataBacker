@@ -41,10 +41,27 @@ app.all('*', passport.authenticate('UserAuthentication', { session: false }), (r
 });
 
 app.post('/push', (req, res) => {
-  if (!req.body.content) res.staus(500).send('No content!');
-  if (!req.body.key) res.staus(500).send('No key!');
+  if (!req.body.content) res.status(500).send('No content!');
+  if (!req.body.key) res.status(500).send('No key!');
 
-  
+  // models.BackupObject.create(req.body);
+  models.Key.findOne({ name: req.body.key }, (err, key) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+    if (key) {
+      //TODO: Update model here
+      console.log('Keys exists');
+    } else {
+      let newKey = {
+        name: req.body.key,
+        version: "1.0.0" ,
+      };
+      models.Key.create(newKey);
+    }
+  });
+
   
   res.send('Success!');
 });

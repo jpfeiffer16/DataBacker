@@ -1,7 +1,8 @@
 module.exports = function(mongoose) {
   let Key = mongoose.model('Key', 
   {
-    name: String
+    name: String,
+    version: String
   });
 
   return Key;
