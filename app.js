@@ -85,6 +85,10 @@ app.post('/push', (req, res) => {
 });
 
 app.post('/get', (req, res) => {
+
+});
+
+app.post('/getcontent', (req, res) => {
   
   if (req.body.key) {
     //Get a specific object
