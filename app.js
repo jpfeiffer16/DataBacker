@@ -26,6 +26,8 @@ let models = require('./models')(mongoose);
 const express = require('express');
 let app = express();
 
+app.set('view engine', 'handlebars')
+
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
