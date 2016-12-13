@@ -28,6 +28,7 @@ let app = express();
 
 app.set('view engine', 'handlebars')
 
+app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -43,6 +44,11 @@ app.all('*', passport.authenticate('UserAuthentication', { session: false }), (r
 });
 
 const semver = require('semver');
+
+let fs = require('fs');
+app.get('/', (req, res) => {
+  fs.createReadStream('./views/index.html').pipe(res);
+});
 
 app.post('/push', (req, res) => {
   if (!req.body) {
