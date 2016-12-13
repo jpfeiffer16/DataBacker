@@ -43,11 +43,21 @@ app.all('*', passport.authenticate('UserAuthentication', { session: false }), (r
 const semver = require('semver');
 
 app.post('/push', (req, res) => {
-  if (!req.body.content) res.status(500).send('No content!');
-  if (!req.body.key) res.status(500).send('No key!');
+  if (!req.body) {
+    res.status(500).send('No content!');
+    return;
+  }
+  if (!req.body.content) {
+    res.status(500).send('No content!');
+    return;
+  }
+  if (!req.body.key) {
+    res.status(500).send('No key!');
+    return;
+  }
 
   // models.BackupObject.create(req.body);
-  models.Key.findOne({ name: req.body.key }, (err, key) => {
+  models.Key.findOne({ name: req.body.key, userId: req.user._id }, (err, key) => {
     if (err) {
       console.error(err);
       process.exit(1);
@@ -67,17 +77,27 @@ app.post('/push', (req, res) => {
         }
         let newObject = req.body;
         newObject.version = newVersion;
-        models.BackupObject.create(newObject);
+        newObject.userId = req.user._id;
+        models.BackupObject.create(newObject, (err) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send();
+          } else {
+            res.send();
+          }
+        });
       });
     } else {
       let newKey = {
         name: req.body.key,
-        version: '1.0.0' 
+        version: '1.0.0' ,
+        userId: req.user._id
       };
       models.Key.create(newKey);
 
       let newObject = req.body;
       newObject.version = '1.0.0';
+      newObject.userId = req.user._id;
       models.BackupObject.create(req.body);
       res.send('Success!');
     }
@@ -85,7 +105,8 @@ app.post('/push', (req, res) => {
 });
 
 app.post('/get', (req, res) => {
-
+  console.log(req.user);
+  //Return a list of all objects for user
 });
 
 app.post('/getcontent', (req, res) => {
@@ -95,52 +116,66 @@ app.post('/getcontent', (req, res) => {
     if (req.body.version) {
       //Grab a specific version
       console.log(req.body);
-      models.BackupObject.findOne({ key : req.body.key, version: req.body.version }, (err, object) => {
+      models.BackupObject.findOne({ key : req.body.key, version: req.body.version, userId: req.user._id }, (err, object) => {
         if (err) {
           console.error(err);
           res.status(500).send();
         }
         if (!object) {
           console.error('No object found.');
-          res.status(500).send();
+          res.status(404).send();
+        } else {
+          res.send(object.content);
         }
-        res.send(object.content);
       });
     } else {
       //Else pull most recent
-      models.BackupObject.find({ key: req.body.key }, (err, objects) => {
-        //Find most recent version here.
+
+      models.Key.findOne({ name: req.body.key, userId: req.user._id }, (err, key) => {
         if (err) {
           console.error(err);
-          res.status(500).send();
+          res.status(404).send();
+        } else if (key) {
+          models.BackupObject.findOne({ key: key.name, version: key.version }, (err, object) => {
+            if (err) {
+              console.error(err);
+              res.status(404).send();
+            } else {
+              res.send(object.content);
+            }
+          });
+        } else {
+          res.status(404).send();
         }
-        if (!objects) {
-          console.error('No object found.');
-          res.status(500).send();
-        }
-
-        res.send(objects.sort((a, b) => {
-          if (a.version == b.version) return 0;
-          return semver.gt(a.version, b.version) ? -1 : 1;
-        })[0].content);
       });
+
+      // models.BackupObject.find({ key: req.body.key }, (err, objects) => {
+      //   //Find most recent version here.
+      //   if (err) {
+      //     console.error(err);
+      //     res.status(500).send();
+      //   }
+      //   if (!objects) {
+      //     console.error('No object found.');
+      //     res.status(404).send();
+      //   } else {
+      //     res.send(objects.sort((a, b) => {
+      //       if (a.version == b.version) return 0;
+      //       return semver.gt(a.version, b.version) ? -1 : 1;
+      //     })[0].content);
+      //   }
+        
+      // });
     }
   } else {
-    //Return a list of all objects for user
+    res.status(404).send('Must specify at least a key.');
   }
 });
-
-app.get('/ensureUser', (req, res) => {
-  // res.send('Hello World!')
-  //TODO: Create user here if necessary
-});
-
-// passport.use(new LocalStrategy(models.User.authenticate()));
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${ PORT }`)
 });
 
-// models.User.register(new models.User({ username: 'jpfeiffer' }), 'test', () => {
+// models.User.register(new models.User({ username: 'test' }), 'test', () => {
 //   console.log('User registered!');
 // });

@@ -4,7 +4,8 @@ module.exports = function(mongoose) {
     fileName: String,
     key: String,
     content: Buffer,
-    version: String
+    version: String,
+    userId: mongoose.Schema.ObjectId
   });
 
   return BackupObject;
