@@ -28,7 +28,7 @@ app.set('view engine', 'handlebars')
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(passport.initialize());
-app.use(passport.session({ secret: 'yo' }));
+app.use(passport.session());
 
 passport.use('UserAuthentication', new BasicStrategy(models.User.authenticate()));
 
