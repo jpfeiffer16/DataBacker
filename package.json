@@ -4,7 +4,8 @@
   "description": "A simple Backup-As-A-Service app",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "bower install"
   },
   "author": "Joe Pfeiffer",
   "license": "ISC",
