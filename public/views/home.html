@@ -1,2 +1,19 @@
-<h1>Home Page</h1>
-<h2>{{ test }}</h2>
+<h4>Your Objects:</h4>
+<table class="table">
+  <thead>
+    <tr>
+      <th>
+        Key
+      </th>
+      <th>
+        Content
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="object in objects">
+      <td>{{ object.key }}</td>
+      <td>{{ object.content }}</td>
+    </tr>
+  </tbody>
+</table>

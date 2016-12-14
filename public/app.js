@@ -1,7 +1,7 @@
 //Create and configure app here
 angular
   .module('app', ['ngRoute'])
-  .config(($routeProvider, $locationProvider) => {
+  .config(($routeProvider, $locationProvider, $httpProvider) => {
     $locationProvider
      .html5Mode({
        enabled: true,
@@ -10,7 +10,10 @@ angular
     $routeProvider
       .when('/', {
         templateUrl: '/views/home.html',
-        controller: 'HomeCtrl',
-        page: 'time'
+        controller: 'HomeCtrl'
+      }).when('/login', {
+        templateUrl: '/views/leogin.html',
+        controller: 'loginCtrl'
       });
+    // $httpProvider.interceptors.push('AuthenticationInterceptor');
   });

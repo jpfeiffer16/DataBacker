@@ -8,9 +8,11 @@
     <!--<link rel="stylesheet" href="/css/style.css">-->
     <link rel="stylesheet" href="/components/bootstrap/dist/css/bootstrap.css" type="text/css">
   </head>
-  <body ng-app="app">
+  <body ng-app="app" ng-controller="MainCtrl">
 
     <div class="container">
+      <h1>DataBacker</h1>
+      <!--<button ng-click="logout()">Logout</button>-->
       <ng-view></ng-view>
     </div>
 
@@ -20,6 +22,10 @@
 
     <script src="/app.js"></script>
 
+    <script src="/services/authenticationInterceptor.js"></script>
+
+    <script src="/controllers/main.js"></script>
     <script src="/controllers/home.js"></script>
+    <script src="/controllers/login.js"></script>
   </body>
 </html>
