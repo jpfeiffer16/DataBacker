@@ -42,7 +42,7 @@ module.exports = function(app, models) {
               console.error(err);
               res.status(500).send();
             } else {
-              res.send();
+              res.send('Success!\n');
             }
           });
         });
@@ -58,7 +58,7 @@ module.exports = function(app, models) {
         newObject.version = '1.0.0';
         newObject.userId = req.user._id;
         models.BackupObject.create(req.body);
-        res.send('Success!');
+        res.send('Success!\n');
       }
     });
   });
