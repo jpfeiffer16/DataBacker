@@ -37,6 +37,7 @@ module.exports = function(app, models) {
           let newObject = req.body;
           newObject.version = newVersion;
           newObject.userId = req.user._id;
+          newObject.content = new Buffer(req.body.content);
           models.BackupObject.create(newObject, (err) => {
             if (err) {
               console.error(err);
@@ -57,6 +58,7 @@ module.exports = function(app, models) {
         let newObject = req.body;
         newObject.version = '1.0.0';
         newObject.userId = req.user._id;
+        newObject.content = new Buffer(req.body.content);        
         models.BackupObject.create(req.body);
         res.send('Success!\n');
       }

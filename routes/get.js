@@ -28,6 +28,7 @@ module.exports = function(app, models) {
             console.error(err);
             res.status(404).send();
           } else if (objects) {
+            console.log(objects);
             res.send(objects);
           } else {
             res.status(404).send();
