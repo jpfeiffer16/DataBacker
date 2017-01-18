@@ -14,6 +14,10 @@ angular
       }).when('/login', {
         templateUrl: '/views/leogin.html',
         controller: 'loginCtrl'
-      });
+      })
+      .when('/object/:key/:version', {
+        templateUrl: '/views/object.html',
+        controller: 'ObjectCtrl'
+      });;
     // $httpProvider.interceptors.push('AuthenticationInterceptor');
   });

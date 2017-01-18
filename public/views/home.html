@@ -6,14 +6,18 @@
         Key
       </th>
       <th>
-        Content
+        Version
       </th>
     </tr>
   </thead>
   <tbody>
     <tr ng-repeat="object in objects">
-      <td>{{ object.key }}</td>
-      <td>{{ object.content }}</td>
+      <td>
+        <a href="/object/{{ object.key }}/{{ object.version }}">
+          {{ object.key }}
+        </a>
+      </td>
+      <td>{{ object.version }}</td>
     </tr>
   </tbody>
 </table>
