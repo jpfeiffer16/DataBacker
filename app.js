@@ -26,7 +26,7 @@ let app = express();
 app.set('view engine', 'handlebars')
 
 app.use(express.static('public'));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(passport.initialize());
 app.use(passport.session());
 
