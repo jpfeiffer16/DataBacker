@@ -6,16 +6,27 @@ module.exports = function(app, models) {
       if (req.body.version) {
         //Grab a specific version
         console.log(req.body);
-        models.BackupObject.findOne({ key : req.body.key, version: req.body.version, userId: req.user._id }, (err, object) => {
+        models.BackupReference.findOne({ key : req.body.key, version: req.body.version, userId: req.user._id }, (err, ref) => {
           if (err) {
             console.error(err);
             res.status(500).send();
           }
-          if (!object) {
-            console.error('No object found.');
+          if (!ref) {
+            console.error('No object reference found.');
             res.status(404).send();
           } else {
-            res.send(object.content);
+            models.BackupObject.findOne({ _id : ref.contentId }).then((err, object) => {
+              if (err) {
+                console.error(err);
+                res.status(500).send();
+              }
+              if (!object) {
+                console.error('No object found');
+                res.status(404).send();
+              }
+
+              res.send(object.content);
+            });
           }
         });
       } else {

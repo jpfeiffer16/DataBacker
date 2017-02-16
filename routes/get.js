@@ -8,7 +8,7 @@ module.exports = function(app, models) {
       if (req.body.version) {
         //Grab a specific version
         console.log(req.body);
-        models.BackupObject.findOne({ key : req.body.key, version: req.body.version, userId: req.user._id }, (err, object) => {
+        models.BackupReference.findOne({ key : req.body.key, version: req.body.version, userId: req.user._id }, (err, object) => {
           if (err) {
             console.error(err);
             res.status(500).send();
@@ -23,7 +23,7 @@ module.exports = function(app, models) {
       } else {
         //Else pull all for key
 
-        models.BackupObject.find({ key: req.body.key, userId: req.user._id }, (err, objects) => {
+        models.BackupReference.find({ key: req.body.key, userId: req.user._id }, (err, objects) => {
           if (err) {
             console.error(err);
             res.status(404).send();
@@ -54,8 +54,8 @@ module.exports = function(app, models) {
         // });
       }
     } else {
-      //Return all object for user here.
-      models.BackupObject.find({ userId: req.user._id }, (err, objects) => {
+      //Return all objects for user here.
+      models.BackupReference.find({ userId: req.user._id }, (err, objects) => {
         if (err) {
           console.error(err);
           res.status(404).send();
