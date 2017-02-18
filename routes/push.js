@@ -3,7 +3,7 @@ const semver = require('semver');
 module.exports = function(app, models) {
   app.post('/push', (req, res) => {
     if (!req.body) {
-      res.status(500).send('No content!');
+      res.status(500).send('No body supplied!');
       return;
     }
     if (!req.body.content) {
@@ -34,18 +34,30 @@ module.exports = function(app, models) {
             console.error(err);
             res.status(500).send();
           }
-          let newObject = req.body;
-          newObject.version = newVersion;
-          newObject.userId = req.user._id;
+          let newRef = {};
+          let newObject = {};
           newObject.content = new Buffer(req.body.content);
-          models.BackupObject.create(newObject, (err) => {
+          models.BackupObject.create(newObject, (err, dbObject) => {
             if (err) {
               console.error(err);
               res.status(500).send();
-            } else {
-              res.send('Success!\n');
             }
+            //Now get this object and create the ref with it.
+            newRef.version = newVersion;
+            newRef.contentId = dbObject._id;
+            newRef.userId = req.user._id;
+            newRef.key = key.name;
+            
+            models.BackupReference.create(newRef, (err) => {
+              if (err) {
+                console.error(err);
+                res.status(500).send();
+              } else {
+                res.send('Success!\n');
+              }
+            });
           });
+          
         });
       } else {
         let newKey = {
@@ -55,12 +67,36 @@ module.exports = function(app, models) {
         };
         models.Key.create(newKey);
 
-        let newObject = req.body;
-        newObject.version = '1.0.0';
-        newObject.userId = req.user._id;
-        newObject.content = new Buffer(req.body.content);        
-        models.BackupObject.create(req.body);
-        res.send('Success!\n');
+        // let newObject = req.body;
+        // newObject.version = '1.0.0';
+        // newObject.userId = req.user._id;
+        // newObject.content = new Buffer(req.body.content);        
+        // models.BackupObject.create(req.body);
+        // res.send('Success!\n');
+
+          let newRef = {};
+          let newObject = {};
+          newObject.content = new Buffer(req.body.content);
+          models.BackupObject.create(newObject, (err, dbObject) => {
+            if (err) {
+              console.error(err);
+              res.status(500).send();
+            }
+            //Now get this object and create the ref with it.
+            newRef.version = '1.0.0';
+            newRef.contentId = dbObject._id;
+            newRef.userId = req.user._id;
+            newRef.key = newKey.name;
+            
+            models.BackupReference.create(newRef, (err) => {
+              if (err) {
+                console.error(err);
+                res.status(500).send();
+              } else {
+                res.send('Success!\n');
+              }
+            });
+          });
       }
     });
   });

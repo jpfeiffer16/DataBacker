@@ -15,7 +15,7 @@ module.exports = function(app, models) {
             console.error('No object reference found.');
             res.status(404).send();
           } else {
-            models.BackupObject.findOne({ _id : ref.contentId }).then((err, object) => {
+            models.BackupObject.findOne({ _id : ref.contentId }, (err, object) => {
               if (err) {
                 console.error(err);
                 res.status(500).send();
@@ -37,16 +37,31 @@ module.exports = function(app, models) {
             console.error(err);
             res.status(404).send();
           } else if (key) {
-            models.BackupObject.findOne({ key: key.name, version: key.version }, (err, object) => {
+            models.BackupReference.findOne({ key : req.body.key, version: key.version, userId: req.user._id }, (err, ref) => {
               if (err) {
                 console.error(err);
+                res.status(500).send();
+              }
+              if (!ref) {
+                console.error('No object reference found.');
                 res.status(404).send();
               } else {
-                console.log(object);
-                res.send(object.content);
+                models.BackupObject.findOne({ _id : ref.contentId }, (err, object) => {
+                  if (err) {
+                    console.error(err);
+                    res.status(500).send();
+                  }
+                  if (!object) {
+                    console.error('No object found');
+                    res.status(404).send();
+                  }
+
+                  res.send(object.content);
+                });
               }
             });
           } else {
+            console.error('No key found');
             res.status(404).send();
           }
         });

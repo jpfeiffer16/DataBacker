@@ -1,5 +1,5 @@
 module.exports = function(mongoose) {
-  let BackupReference = mongoose.model('Object', 
+  let BackupReference = mongoose.model('Reference', 
   {
     fileName: String,
     key: String,
@@ -8,5 +8,5 @@ module.exports = function(mongoose) {
     userId: mongoose.Schema.ObjectId
   });
 
-  return BackupObject;
+  return BackupReference;
 };
